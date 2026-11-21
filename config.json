@@ -15,6 +15,6 @@
     "supabaseUrl": "https://zahlnsmngkzvqxhjdjzb.supabase.co",
     "supabaseKey": "sb_publishable_AadDuvbDEzbu2uqzRyo5Yw_42l3PkT2",
     "msgBudget": 60,
-    "tables": false
+    "tables": true
   }
 }

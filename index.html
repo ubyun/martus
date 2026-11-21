@@ -7315,7 +7315,20 @@
           }
         } catch (e) {}
       }
-      function sbInit() {
+      async function sbInit() {
+        /* 테이블이 없거나 방문자 권한(grant)이 없으면, 기록은 예전처럼 각자 화면에만 남깁니다. */
+        let error = null;
+        try {
+          ({ error } = await SB.from("chapel_notes").select("id", { count: "exact", head: true }));
+        } catch (e) {
+          error = e || "error";
+        }
+        if (error) {
+          SBT = false;
+          console.warn("기록용 테이블을 쓸 수 없어 이 화면에만 남깁니다. supabase.sql 을 확인해 주세요.");
+          renderStats();
+          return;
+        }
         sbNotes();
         sbCandles();
         sbVisit();
