@@ -1,0 +1,11 @@
+{
+  "name": "martus-chapel-gallery",
+  "private": true,
+  "description": "3D 교회 마을 온라인 사진전",
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build-photos.mjs _site",
+    "dev": "npx --yes serve _site",
+    "format": "npx --yes prettier@3 --write index.html"
+  }
+}
