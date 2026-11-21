@@ -71,14 +71,15 @@
 GitHub Pages는 그림 파일만 보여 주는 곳이라, 그대로 두면 **각자 혼자 걷는 사진전**이 됩니다.
 같은 시간에 들어온 사람들의 양이 보이고 대화하려면, 무료로 시작할 수 있는 실시간 서비스 **Supabase** 를 연결합니다.
 
-1. [supabase.com](https://supabase.com) 에 가입하고 새 프로젝트를 만듭니다.
-2. 프로젝트의 **Project Settings → API** 에서 **Project URL** 과 **anon public** 키를 복사합니다.
-3. `config.json` 의 `realtime` 에 붙여 넣습니다.
+1. [supabase.com](https://supabase.com) 에 가입하고 새 프로젝트를 만듭니다. (지역은 Seoul 추천)
+2. 프로젝트의 **Project Settings → API Keys** 에서 **Project URL** 과 **공개용 키**(`sb_publishable_...`, 예전 화면에서는 `anon public`)를 복사합니다.
+3. `config.json` 의 `realtime` 에 붙여 넣습니다. (이 저장소에는 이미 넣어 두었습니다.)
 
 ```json
 "realtime": {
   "supabaseUrl": "https://abcd1234.supabase.co",
-  "supabaseAnonKey": "eyJhbGciOi...",
+  "supabaseKey": "sb_publishable_...",
+  "msgBudget": 60,
   "tables": false
 }
 ```
@@ -91,9 +92,12 @@ GitHub Pages는 그림 파일만 보여 주는 곳이라, 그대로 두면 **각
 5. `config.json` 에서 `"tables": true` 로 바꿉니다.
 
 주의할 점
-- `anon public` 키는 원래 공개되는 키라 저장소에 넣어도 됩니다. **`service_role` 키는 절대 넣지 마세요.**
+- 공개용 키(`sb_publishable_...` 또는 `anon public`)는 원래 웹페이지에 드러나는 키라 저장소에 넣어도 됩니다. **비밀 키(`sb_secret_...`, `service_role`)는 절대 넣지 마세요.**
 - 기도의 벽에 올라온 글은 누구나 쓸 수 있고, 지우는 것은 미디어팀이 Supabase **Table Editor** 에서 합니다.
-- 무료 플랜에는 동시 접속 수와 메시지 양 제한이 있어요. 큰 행사로 많은 사람이 한꺼번에 들어올 예정이면 Supabase 요금 안내를 먼저 확인해 주세요.
+- 무료 플랜은 동시 접속 200명, 초당 메시지 100개(보낸 것과 받은 것 모두)까지이고, 접속자 정보(presence)는 한 사람당 30초에 5번까지만 바꿀 수 있어요.
+  그래서 움직임과 대화는 broadcast 로 보내고, 접속한 사람이 많을수록 위치를 보내는 간격을 자동으로 늘립니다. 사람이 많으면 다른 양의 움직임이 조금 늦게 따라올 수 있어요.
+- 유료 플랜(Pro)으로 올리면 초당 메시지가 500개로 늘어나니, `msgBudget` 을 `300` 정도로 올리면 더 부드럽게 보입니다.
+- 무료 프로젝트는 일주일 동안 쓰는 사람이 거의 없으면 잠시 멈춥니다. 전시를 열기 전에 한 번 들어가 보고, 멈춰 있으면 Supabase 대시보드에서 **Resume project** 를 누르세요.
 
 ## 6. 꼭 알아 두세요
 

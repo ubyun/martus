@@ -1445,7 +1445,9 @@
         </div>
         <p id="hSub"></p>
         <p>
-          미디어팀이 한 해 동안 예배와 모임 곁에서 담아 온 장면을 작은 교회 마을 ‘빛의 갤러리’의 7개 전시실에 걸었습니다. 어린양 하나가 되어 천천히 걸어 보세요. 같은 시간에 들어온 사람들도 함께 보이고, 대화창으로 인사를 나누거나 지나치며 평안을 빌어 줄 수 있어요.
+          미디어팀이 한 해 동안 예배와 모임 곁에서 담아 온 장면을 작은 교회 마을 ‘빛의 갤러리’의 7개 전시실에
+          걸었습니다. 어린양 하나가 되어 천천히 걸어 보세요. 같은 시간에 들어온 사람들도 함께 보이고,
+          대화창으로 인사를 나누거나 지나치며 평안을 빌어 줄 수 있어요.
         </p>
         <div class="keys">
           <kbd>바닥 클릭</kbd>
@@ -5972,9 +5974,34 @@
               greet: 0,
               c: o.c,
               n: o.n,
+              tx: o.x,
+              tz: o.z,
+              tt: now,
+              vx: 0,
+              vz: 0,
+              span: 0,
             };
             peerVis.set(p.peer, v);
           } else {
+            /* 위치가 드문드문 올 때도 부드럽게 걷도록, 지난 두 위치로 걷는 방향과 빠르기를 어림합니다. */
+            if (o.x !== v.tx || o.z !== v.tz) {
+              const gapS = (now - v.tt) / 1000;
+              if (o.st === "w" && gapS > 0.05 && gapS < 4) {
+                let vx = (o.x - v.tx) / gapS,
+                  vz = (o.z - v.tz) / gapS;
+                const sp = Math.hypot(vx, vz);
+                if (sp > 8) {
+                  vx *= 8 / sp;
+                  vz *= 8 / sp;
+                }
+                v.vx = vx;
+                v.vz = vz;
+                v.span = Math.min(gapS, 3);
+              } else v.vx = v.vz = 0;
+              v.tx = o.x;
+              v.tz = o.z;
+              v.tt = now;
+            } else if (o.st !== "w") v.vx = v.vz = 0;
             if (o.et && o.et !== v.et) {
               v.et = o.et;
               if (o.ev === "b") ringBell(false);
@@ -6025,14 +6052,21 @@
         for (const o of peersArr) {
           const v = peerVis.get(o.peer);
           if (!v) continue;
-          const d = Math.hypot(o.x - v.x, o.z - v.z);
+          let tx = o.x,
+            tz = o.z;
+          if (v.vx || v.vz) {
+            const k = Math.min((now - v.tt) / 1000, v.span);
+            tx += v.vx * k;
+            tz += v.vz * k;
+          }
+          const d = Math.hypot(tx - v.x, tz - v.z);
           const moving = d > 0.05 && o.st !== "s";
           if (d > 12) {
-            v.x = o.x;
-            v.z = o.z;
+            v.x = tx;
+            v.z = tz;
           } else {
-            v.x = damp(v.x, o.x, 7, dt);
-            v.z = damp(v.z, o.z, 7, dt);
+            v.x = damp(v.x, tx, 7, dt);
+            v.z = damp(v.z, tz, 7, dt);
           }
           v.rot = angDamp(v.rot, o.r, 8, dt);
           v.y = damp(v.y, o.st === "s" ? o.sy : groundY(v.x, v.z), 10, dt);
@@ -7028,18 +7062,16 @@
               h = r.full.h;
             }
             const ov = $("aOrder").value.trim();
-            await db
-              .doc("works/" + editId)
-              .set({
-                sec,
-                order: ov === "" ? prev.order : Number(ov),
-                title: $("aTitle").value.trim().slice(0, 40) || prev.title,
-                ...meta,
-                asset,
-                thumb,
-                w,
-                h,
-              });
+            await db.doc("works/" + editId).set({
+              sec,
+              order: ov === "" ? prev.order : Number(ov),
+              title: $("aTitle").value.trim().slice(0, 40) || prev.title,
+              ...meta,
+              asset,
+              thumb,
+              w,
+              h,
+            });
             if (files[0] && assets)
               for (const id of [prev.asset, prev.thumb])
                 if (id && id !== asset && id !== thumb) assets.delete(id).catch(() => {});
@@ -7057,18 +7089,16 @@
                 const r = await prepImage2(files[i]);
                 const a = (await assets.upload(r.full.blob)).id,
                   t = (await assets.upload(r.th.blob)).id;
-                await db
-                  .doc("works/" + newId())
-                  .set({
-                    sec,
-                    order: base + 1 + i,
-                    title: one ? $("aTitle").value.trim().slice(0, 40) : baseName(files[i].name),
-                    ...meta,
-                    asset: a,
-                    thumb: t,
-                    w: r.full.w,
-                    h: r.full.h,
-                  });
+                await db.doc("works/" + newId()).set({
+                  sec,
+                  order: base + 1 + i,
+                  title: one ? $("aTitle").value.trim().slice(0, 40) : baseName(files[i].name),
+                  ...meta,
+                  asset: a,
+                  thumb: t,
+                  w: r.full.w,
+                  h: r.full.h,
+                });
                 ok++;
               } catch (err) {
                 console.warn(err);
@@ -7099,21 +7129,52 @@
       let SB = null,
         SBT = false;
       async function supabaseRoom(rt) {
-        const mod = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/+esm");
-        const sb = mod.createClient(rt.supabaseUrl, rt.supabaseAnonKey, { auth: { persistSession: false } });
+        const mod = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.109.0/+esm");
+        const apiKey = rt.supabaseKey || rt.supabaseAnonKey;
+        const sb = mod.createClient(rt.supabaseUrl, apiKey, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
         const key = crypto.randomUUID
           ? crypto.randomUUID()
           : Math.random().toString(36).slice(2) + Date.now().toString(36);
-        const ch = sb.channel(rt.channel || "chapel-village", { config: { presence: { key } } });
+        const ch = sb.channel(rt.channel || "chapel-village", {
+          config: { presence: { key }, broadcast: { self: false } },
+        });
+        /* Supabase 무료 요금제 한도에 맞춰 보냅니다.
+           - 움직임·대화는 broadcast 로 보냅니다. 초당 메시지 100개(보낸 것 + 받은 것 모두)가 한도라서,
+             접속한 사람 수에 맞춰 보내는 간격을 늘립니다. (config.json 의 realtime.msgBudget 으로 조절)
+           - presence 는 한 사람당 30초에 5번까지라서, 들어올 때와 몇 초에 한 번씩만 씁니다.
+             새로 들어온 사람은 이 presence 로 다른 사람의 별명·모습·마지막 위치를 먼저 받습니다. */
+        const BUDGET = Math.max(20, +rt.msgBudget || 60);
         let handler = null,
-          pending = null,
-          timer = 0;
+          mine = null,
+          timer = 0,
+          sentAt = 0,
+          sentKey = "",
+          sentImp = "",
+          trackTimer = 0,
+          trackAt = 0,
+          trackKey = "";
+        const live = new Map(),
+          senders = new Map();
+        const count = () => Math.max(1, Object.keys(ch.presenceState()).length);
+        const imp = (d) => [d.st, d.sy, d.e, d.h, d.n, d.c, d.b, d.a, d.s, d.m, d.mt, d.ev, d.et].join("|");
+        const gap = () => {
+          const now = Date.now();
+          let active = 1;
+          for (const [k, at] of senders)
+            if (now - at < 6000) active++;
+            else if (now - at > 60000) senders.delete(k);
+          return Math.max(220, (1000 * active * count()) / BUDGET);
+        };
         const peers = () => {
           const st = ch.presenceState(),
             out = [];
           for (const k in st) {
             const a = st[k];
             if (!a || !a.length) continue;
+            const pm = a[a.length - 1] || {},
+              lv = live.get(k);
             out.push({
               peer: k,
               by: null,
@@ -7121,14 +7182,65 @@
               sameTab: k === key,
               kind: "viewer",
               guest: false,
-              presence: a[a.length - 1],
+              presence: lv && lv.t > (+pm.t || 0) ? lv.d : pm,
               updatedAt: Date.now(),
             });
           }
           return out;
         };
-        ch.on("presence", { event: "sync" }, () => {
+        const ping = () => {
           if (handler) handler({ peers: peers() });
+        };
+        const doTrack = () => {
+          trackTimer = 0;
+          if (!mine) return;
+          const k = JSON.stringify(mine);
+          if (k === trackKey) return;
+          trackKey = k;
+          trackAt = Date.now();
+          ch.track({ ...mine, t: trackAt }).catch(() => {});
+        };
+        const planTrack = () => {
+          if (trackTimer) return;
+          const n = count(),
+            every = Math.max(8000, (1000 * n * n) / 12);
+          trackTimer = setTimeout(doTrack, Math.max(0, trackAt + every - Date.now()));
+        };
+        const send = () => {
+          timer = 0;
+          if (!mine) return;
+          const k = JSON.stringify(mine);
+          if (k !== sentKey) {
+            sentKey = k;
+            sentImp = imp(mine);
+            sentAt = Date.now();
+            ch.send({ type: "broadcast", event: "s", payload: { ...mine, k: key, t: sentAt } }).catch(
+              () => {},
+            );
+          }
+          planTrack();
+        };
+        const plan = () => {
+          if (!mine) return;
+          const wait = (imp(mine) !== sentImp ? 220 : gap()) - (Date.now() - sentAt);
+          clearTimeout(timer);
+          timer = setTimeout(send, Math.max(0, wait));
+        };
+        ch.on("presence", { event: "sync" }, () => {
+          const st = ch.presenceState(),
+            now = Date.now();
+          for (const [k, v] of live) if (!st[k] && now - v.at > 10000) live.delete(k);
+          ping();
+        });
+        ch.on("broadcast", { event: "s" }, (msg) => {
+          const p = msg && msg.payload;
+          if (!p || typeof p.k !== "string" || p.k.length > 64 || p.k === key) return;
+          const t = +p.t || 0,
+            o = live.get(p.k);
+          if (o && t <= o.t) return;
+          live.set(p.k, { d: p, t, at: Date.now() });
+          senders.set(p.k, Date.now());
+          ping();
         });
         const ok = await new Promise((res) => {
           const t = setTimeout(() => res(false), 12000);
@@ -7148,19 +7260,11 @@
           } catch (e) {}
           return null;
         }
-        const flush = () => {
-          timer = 0;
-          if (pending) {
-            const d = pending;
-            pending = null;
-            ch.track(d).catch(() => {});
-          }
-        };
         return {
           sb,
           presence(d) {
-            pending = d;
-            if (!timer) timer = setTimeout(flush, 260);
+            mine = d;
+            plan();
             return Promise.resolve();
           },
           onPeers(fn) {
@@ -7225,7 +7329,7 @@
         if (!C || typeof C.use !== "function") {
           const cfg = await loadStatic();
           const rt = cfg && cfg.realtime;
-          if (rt && rt.supabaseUrl && rt.supabaseAnonKey) {
+          if (rt && rt.supabaseUrl && (rt.supabaseKey || rt.supabaseAnonKey)) {
             try {
               const r = await supabaseRoom(rt);
               if (r) {
@@ -7754,6 +7858,7 @@
             get peersArr() {
               return peersArr;
             },
+            peerVis,
             camera,
             makeSheep,
             animLamb,

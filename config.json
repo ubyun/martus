@@ -12,8 +12,9 @@
     { "name": "미디어팀의 시선", "desc": "카메라 뒤에서 바라본 우리 교회" }
   ],
   "realtime": {
-    "supabaseUrl": "",
-    "supabaseAnonKey": "",
+    "supabaseUrl": "https://zahlnsmngkzvqxhjdjzb.supabase.co",
+    "supabaseKey": "sb_publishable_AadDuvbDEzbu2uqzRyo5Yw_42l3PkT2",
+    "msgBudget": 60,
     "tables": false
   }
 }
