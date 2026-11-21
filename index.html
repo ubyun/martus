@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover" />
-    <title>빛이 머무는 자리 · 온라인 예배당</title>
+    <title>2026 MARTUS 온라인 교회</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -1167,12 +1167,12 @@
     <canvas
       id="gl"
       tabindex="0"
-      aria-label="3D 교회 마을. 바닥을 눌러 걷고, 끌어서 둘러볼 수 있습니다"
+      aria-label="MARTUS 온라인 교회. 바닥을 눌러 걷고, 끌어서 둘러볼 수 있습니다"
     ></canvas>
     <div id="tags" aria-hidden="true"></div>
 
     <div class="ui tl">
-      <button class="ib" id="bMap" type="button" aria-label="마을 둘러보기">
+      <button class="ib" id="bMap" type="button" aria-label="교회 둘러보기">
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path
             fill="none"
@@ -1185,8 +1185,8 @@
         <span class="lbl">둘러보기</span>
       </button>
       <div class="brand">
-        <b id="hTitle">빛이 머무는 자리</b>
-        <small id="hChurch">우리 교회 미디어팀</small>
+        <b id="hTitle">MARTUS 사진</b>
+        <small id="hChurch">그해, 우리는</small>
       </div>
       <button class="ib who" id="bPeople" type="button" aria-label="함께 있는 사람">
         <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -1374,10 +1374,10 @@
       <svg viewBox="0 0 36 36" aria-hidden="true">
         <path fill="currentColor" d="M15.5 3h5v8.5H29v5h-8.5V33h-5V16.5H7v-5h8.5z" />
       </svg>
-      <h1>빛이 머무는 자리</h1>
-      <p id="lMsg">마을로 가는 길을 준비하고 있어요</p>
+      <h1>MARTUS 사진전</h1>
+      <p id="lMsg">교회로 가는 길을 준비하고 있어요</p>
       <div class="bar"><i id="lBar"></i></div>
-      <p id="lSub">잠시 후 어린양이 되어 마을을 걸을 수 있어요</p>
+      <p id="lSub">잠시 후 어린양이 되어 교회를 걸을 수 있어요</p>
       <p id="lErr" hidden></p>
     </div>
 
@@ -1418,7 +1418,7 @@
         </div>
         <p class="mute">장소를 고르거나 지도를 누르면 그곳으로 옮겨 드려요.</p>
         <div class="mapwrap">
-          <canvas id="mapC" width="720" height="720" aria-label="마을 지도"></canvas>
+          <canvas id="mapC" width="720" height="720" aria-label="교회 지도"></canvas>
           <div class="places" id="places"></div>
         </div>
       </div>
@@ -1445,7 +1445,7 @@
         </div>
         <p id="hSub"></p>
         <p>
-          미디어팀이 한 해 동안 예배와 모임 곁에서 담아 온 장면을 작은 교회 마을 ‘빛의 갤러리’의 7개 전시실에
+          미디어팀이 한 해 동안 예배와 모임 곁에서 담아 온 장면을 작은 교회 마을 ‘그해, 우리는’의 7개 전시실에
           걸었습니다. 어린양 하나가 되어 천천히 걸어 보세요. 같은 시간에 들어온 사람들도 함께 보이고,
           대화창으로 인사를 나누거나 지나치며 평안을 빌어 줄 수 있어요.
         </p>
@@ -1466,7 +1466,7 @@
           <span>닉네임과 양 종류·소품 바꾸기</span>
         </div>
         <p class="mute" id="hSample">
-          빛의 갤러리 7개 전시실에 걸린 사진 168점과 작가 이름은 샘플이며, 사진처럼 보이는 그림을 코드로 그린
+          그해, 우리는 7개 전시실에 걸린 사진 168점과 작가 이름은 샘플이며, 사진처럼 보이는 그림을 코드로 그린
           것입니다.
         </p>
         <p class="mute">
@@ -1699,9 +1699,9 @@
       myName = cleanText(myName, 12) || roll();
       store.set("chapel.name", myName);
       const CFG = {
-        church: "우리 교회 미디어팀",
-        title: "빛이 머무는 자리",
-        sub: "2026 미디어팀 온라인 사진전 · 말없이 함께 걷는 예배당",
+        church: "송천동 사랑의교회",
+        title: "MARTUS 사진전",
+        sub: "2026 미디어팀 온라인 사진전",
       };
       const PRAY = [
         ["너희는 가만히 있어 내가 하나님 됨을 알지어다", "시편 46:10"],
@@ -3781,13 +3781,13 @@
       const MUS = { x0: 14, x1: 70, z0: -41, z1: 1, zc0: -23, zc1: -17, H: 4.6, door: 21 };
       const SEC_COLORS = ["#2f5bd3", "#c23a4f", "#d08a25", "#2f9c8f", "#9a6a40", "#7a52cc", "#3a7a9c"];
       const DEF_SECTIONS = [
-        { name: "예배의 자리", desc: "주일과 새벽, 예배가 드려진 자리들" },
-        { name: "찬양하는 사람들", desc: "무대 위와 뒤에서 찬양을 준비한 얼굴들" },
-        { name: "다음세대", desc: "교회학교와 청소년부가 함께한 한 해" },
-        { name: "함께 떠난 길", desc: "수련회와 단기선교, 소풍의 기록" },
-        { name: "섬김의 손", desc: "주방과 주차장, 안내 자리의 보이지 않는 섬김" },
-        { name: "교회의 사계절", desc: "봄부터 겨울까지 교회 마당의 풍경" },
-        { name: "미디어팀의 시선", desc: "카메라 뒤에서 바라본 우리 교회" },
+        { name: "복음으로여는문", desc: "행축 & 가을 행축" },
+        { name: "일상에스민복음", desc: "버스킹 & 플로깅" },
+        { name: "기도로피운소망", desc: "청년부 기도회 & 지우기" },
+        { name: "은혜로물든계절", desc: "겨울 수련회 & 여름 수련회" },
+        { name: "함께여서좋은날", desc: "체육대회 & 마르투스컵 & 윷놀이" },
+        { name: "한마음으로섬김", desc: "새가족팀(새가족환영회) & 안내팀(예습기, 추수감사주일) & 찬양팀(찬양집회)" },
+        { name: "일상에남은우리", desc: "팸별 추억사진" },
       ];
       const SECS = DEF_SECTIONS.map((s, i) => ({
         name: s.name,
