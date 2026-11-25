@@ -1102,6 +1102,114 @@
       .sw button[aria-pressed="true"] {
         box-shadow: 0 0 0 2px #2346a8;
       }
+      .place {
+        position: fixed;
+        z-index: 4;
+        left: 50%;
+        top: calc(max(12px, env(safe-area-inset-top)) + 66px);
+        transform: translate(-50%, -8px);
+        opacity: 0;
+        transition:
+          opacity 0.7s,
+          transform 0.7s;
+        pointer-events: none;
+        text-align: center;
+        color: #fff;
+        text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+        width: max-content;
+        max-width: 88vw;
+        background: rgba(20, 24, 40, 0.5);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 8px 20px 9px;
+        border-radius: 18px;
+      }
+      .place.on {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+      .place b {
+        display: block;
+        font:
+          700 25px "Gowun Batang",
+          serif;
+      }
+      .place b::before,
+      .place b::after {
+        content: "";
+        display: inline-block;
+        width: 26px;
+        height: 1px;
+        background: rgba(255, 233, 180, 0.8);
+        vertical-align: middle;
+        margin: 0 10px;
+      }
+      .place small {
+        display: block;
+        margin-top: 3px;
+        font-size: 13px;
+        opacity: 0.88;
+      }
+      .joy {
+        position: fixed;
+        z-index: 5;
+        left: max(16px, env(safe-area-inset-left));
+        bottom: calc(max(14px, env(safe-area-inset-bottom)) + 94px);
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(20, 24, 40, 0.18) 0 54%, rgba(20, 24, 40, 0.32) 56% 100%);
+        border: 1.5px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        display: none;
+      }
+      body.hasjoy .joy {
+        display: block;
+      }
+      body.hasjoy.chatting .joy {
+        display: none;
+      }
+      .joy svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.7;
+        pointer-events: none;
+      }
+      .joy i {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 52px;
+        height: 52px;
+        margin: -26px 0 0 -26px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.92);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+        transition: transform 0.18s;
+        pointer-events: none;
+      }
+      .joy.on i {
+        transition: none;
+        background: #fff;
+      }
+      body.hasjoy .act {
+        align-self: flex-end;
+        margin-right: max(14px, env(safe-area-inset-right));
+        max-width: calc(100vw - 170px);
+      }
+      body.hasjoy .chat {
+        bottom: calc(max(14px, env(safe-area-inset-bottom)) + 226px);
+      }
+      body.hasjoy .chat.open {
+        bottom: calc(max(14px, env(safe-area-inset-bottom)) + 82px);
+      }
       @media (max-width: 900px) {
         .chat {
           bottom: calc(max(14px, env(safe-area-inset-bottom)) + 140px);
@@ -1263,6 +1371,16 @@
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <div class="verse" id="verse" aria-live="polite"></div>
     <div class="timer" id="timer" hidden></div>
+    <div class="place" id="place" aria-live="polite">
+      <b></b>
+      <small></small>
+    </div>
+    <div class="joy" id="joy" aria-hidden="true">
+      <svg viewBox="0 0 120 120">
+        <path fill="#fff" d="M60 9l7 9H53zM60 111l7-9H53zM9 60l9-7v14zM111 60l-9-7v14z" />
+      </svg>
+      <i></i>
+    </div>
     <div class="bottom">
       <button class="act" id="bAct" type="button" hidden></button>
       <nav class="dock" aria-label="동작">
@@ -1456,6 +1574,10 @@
           <span>둘러보기 · 휠이나 두 손가락으로 확대/축소</span>
           <kbd>W A S D · 방향키</kbd>
           <span>걷기 · Shift로 빨리 걷기</span>
+          <kbd>조이스틱</kbd>
+          <span>휴대폰에서는 왼쪽 아래 동그라미를 밀어 걷기 · 끝까지 밀면 빨리 걷기</span>
+          <kbd>안내판 · 길 표시</kbd>
+          <span>갈림길마다 가는 방향을 알려 줘요 · 안내판을 누르면 둘러보기</span>
           <kbd>Q · E</kbd>
           <span>시점 돌리기</span>
           <kbd>Enter · Space</kbd>
@@ -3786,7 +3908,10 @@
         { name: "기도로피운소망", desc: "청년부 기도회 & 지우기" },
         { name: "은혜로물든계절", desc: "겨울 수련회 & 여름 수련회" },
         { name: "함께여서좋은날", desc: "체육대회 & 마르투스컵 & 윷놀이" },
-        { name: "한마음으로섬김", desc: "새가족팀(새가족환영회) & 안내팀(예습기, 추수감사주일) & 찬양팀(찬양집회)" },
+        {
+          name: "한마음으로섬김",
+          desc: "새가족팀(새가족환영회) & 안내팀(예습기, 추수감사주일) & 찬양팀(찬양집회)",
+        },
         { name: "일상에남은우리", desc: "팸별 추억사진" },
       ];
       const SECS = DEF_SECTIONS.map((s, i) => ({
@@ -4606,6 +4731,409 @@
             };
           }),
         );
+      }
+
+      /* ===== 길 안내 (안내판 · 노면 표시) ===== */
+      /* 갈림길마다 세운 안내판과 길 위의 표시입니다. 이름은 PLACES 에서 가져오므로, 장소 이름을 바꾸면 함께 바뀝니다.
+         [장소 id, [향하는 지점 x, z], 작은 글씨] — 화살표는 그 지점 쪽을 45° 단위로 가리킵니다.
+         rot 은 안내판 앞면이 바라보는 방향입니다. (0 = 입구 쪽, Math.PI / 2 = 오른쪽(동쪽), -Math.PI / 2 = 왼쪽(서쪽)) */
+      const GUIDE_BOARDS = [
+        {
+          x: 2.5,
+          z: 32.4,
+          rot: 0,
+          front: [
+            ["plaza", [0, 20]],
+            ["chapel", [0, 20]],
+            ["gallery", [0, 20], "7개 전시실"],
+            ["cafe", [12.6, 30.6]],
+            ["pond", [-9.6, 30]],
+          ],
+          back: [
+            ["gate", [0, 45]],
+            ["cafe", [12.6, 30.6]],
+            ["pond", [-9.6, 30]],
+          ],
+        },
+        {
+          x: 2.7,
+          z: 19.2,
+          rot: 0,
+          front: [
+            ["chapel", [0, 0]],
+            ["gallery", [8.5, 7], "7개 전시실"],
+            ["bell", [-8.5, 7.5]],
+            ["garden", [-9, -4]],
+          ],
+          back: [
+            ["gate", [0, 30]],
+            ["cafe", [8, 30]],
+            ["pond", [-6, 30]],
+          ],
+        },
+        {
+          x: 2.3,
+          z: -1.9,
+          rot: 0,
+          front: [
+            ["chapel", [0, -9]],
+            ["garden", [-8, -8]],
+          ],
+          back: [
+            ["plaza", [0, 7]],
+            ["gallery", [8.5, 7]],
+            ["bell", [-8.5, 7.5]],
+            ["gate", [0, 20]],
+          ],
+        },
+        {
+          x: 11.6,
+          z: 8.4,
+          rot: -Math.PI / 2,
+          front: [["gallery", [21, 2], "1 ~ 7 전시실"]],
+          back: [
+            ["plaza", [6, 7.5]],
+            ["chapel", [0, 0]],
+            ["gate", [0, 20]],
+            ["cafe", [0, 20]],
+          ],
+        },
+        {
+          x: -11.4,
+          z: 9.2,
+          rot: Math.PI / 2,
+          front: [["bell", [-20, 6.8]]],
+          back: [
+            ["plaza", [-6, 7.5]],
+            ["chapel", [0, 0]],
+            ["gallery", [8.5, 7]],
+            ["gate", [0, 20]],
+          ],
+        },
+      ];
+      /* 길 위의 표시: dir 은 걸어가는 방향, to 는 [장소 id, [향하는 지점]] 입니다. */
+      const FLOOR_MARKS = [
+        {
+          x: 0,
+          z: 34.6,
+          dir: [0, -1],
+          to: [
+            ["plaza", [0, 17]],
+            ["pond", [-9.6, 30]],
+            ["cafe", [12.6, 30.6]],
+          ],
+        },
+        { x: 0, z: 24.8, dir: [0, -1], to: [["plaza", [0, 10]]] },
+        { x: 0, z: 21.2, dir: [0, 1], to: [["gate", [0, 45]]] },
+        {
+          x: 0,
+          z: 13.4,
+          dir: [0, -1],
+          to: [
+            ["chapel", [0, -1]],
+            ["bell", [-8.5, 7.5]],
+            ["gallery", [8.5, 7]],
+          ],
+        },
+        {
+          x: 0,
+          z: -3.4,
+          dir: [0, -1],
+          to: [
+            ["chapel", [0, -9]],
+            ["garden", [-1.4, -6.5]],
+          ],
+        },
+        { x: 0, z: -7.6, dir: [0, 1], to: [["plaza", [0, 7]]] },
+        { x: 16.2, z: 5.1, dir: [1, -0.15], to: [["gallery", [21, 4.4]]] },
+        { x: 18.8, z: 4.6, dir: [-1, 0.15], to: [["plaza", [8, 7]]] },
+        { x: -12.8, z: 6.9, dir: [-1, -0.1], to: [["bell", [-20, 6.8]]] },
+        { x: -16.8, z: 6.7, dir: [1, 0.05], to: [["plaza", [-8, 7.5]]] },
+        { x: 5.6, z: 30.25, dir: [1, 0.05], to: [["cafe", [12.6, 30.6]]] },
+        {
+          x: 9.6,
+          z: 30.45,
+          dir: [-1, -0.05],
+          to: [
+            ["plaza", [0, 20]],
+            ["gate", [0, 40]],
+          ],
+        },
+        { x: -4.4, z: 30, dir: [-1, 0], to: [["pond", [-9.6, 30]]] },
+        {
+          x: -7.4,
+          z: 30,
+          dir: [1, 0],
+          to: [
+            ["plaza", [0, 20]],
+            ["gate", [0, 40]],
+          ],
+        },
+      ];
+      const MAP_BOARD = { x: -4.3, z: 36.2, rot: 0.5 };
+      const SIGNM = [];
+      function signMat(tex, day = 0.12, night = 0.5, o = {}) {
+        const m = new THREE.MeshStandardMaterial({
+          map: tex,
+          emissiveMap: tex,
+          emissive: 0xffffff,
+          emissiveIntensity: day,
+          roughness: 0.85,
+          ...o,
+        });
+        m.userData.day = day;
+        m.userData.night = night;
+        SIGNM.push(m);
+        return m;
+      }
+      const placeName = (id) => (PLACES.find((p) => p.id === id) || {}).name || id;
+      const snap45 = (a) => Math.round(a / (Math.PI / 4)) * (Math.PI / 4);
+      /* (fx, fz) 쪽을 보고 선 사람에게 (tx, tz) 가 어느 쪽인지: 0 = 앞, 음수 = 왼쪽, 양수 = 오른쪽 */
+      function turnTo(fx, fz, x, z, tx, tz) {
+        const dx = tx - x,
+          dz = tz - z;
+        return snap45(Math.atan2(-dx * fz + dz * fx, dx * fx + dz * fz));
+      }
+      const turnOrder = (a) => (Math.abs(a) < 0.01 ? 0 : a < 0 ? 1 - a : 10 + a);
+      function drawArrow(g, x, y, s, a) {
+        g.save();
+        g.translate(x, y);
+        g.rotate(a);
+        g.beginPath();
+        g.moveTo(0, -s);
+        g.lineTo(s * 0.72, -s * 0.06);
+        g.lineTo(s * 0.27, -s * 0.06);
+        g.lineTo(s * 0.27, s * 0.9);
+        g.lineTo(-s * 0.27, s * 0.9);
+        g.lineTo(-s * 0.27, -s * 0.06);
+        g.lineTo(-s * 0.72, -s * 0.06);
+        g.closePath();
+        g.fill();
+        g.restore();
+      }
+      function roundRect(g, x, y, w, h, r) {
+        g.beginPath();
+        g.moveTo(x + r, y);
+        g.arcTo(x + w, y, x + w, y + h, r);
+        g.arcTo(x + w, y + h, x, y + h, r);
+        g.arcTo(x, y + h, x, y, r);
+        g.arcTo(x, y, x + w, y, r);
+        g.closePath();
+      }
+      function guideRows(list, fx, fz, x, z) {
+        const one = list.length === 1;
+        return list
+          .map(([id, v, sub]) => ({
+            name: placeName(id),
+            sub: sub || (one ? (PLACES.find((p) => p.id === id) || {}).d : ""),
+            a: turnTo(fx, fz, x, z, v[0], v[1]),
+          }))
+          .sort((p, q) => turnOrder(p.a) - turnOrder(q.a));
+      }
+      function drawGuideSide(g, y0, w, h, rows) {
+        g.fillStyle = "#3d2a1c";
+        g.fillRect(0, y0, w, h);
+        g.strokeStyle = "#d8b56a";
+        g.lineWidth = 5;
+        g.strokeRect(9, y0 + 9, w - 18, h - 18);
+        const n = rows.length,
+          rh = (h - 36) / Math.max(n, 2.2),
+          top = y0 + 18 + (h - 36 - rh * n) / 2,
+          fs = Math.min(n === 1 ? 66 : 46, rh * 0.6);
+        g.textAlign = "left";
+        g.textBaseline = "middle";
+        rows.forEach((r, i) => {
+          const cy = top + rh * (i + 0.5);
+          g.fillStyle = "#e8c470";
+          drawArrow(g, 54, cy, fs * 0.52, r.a);
+          g.fillStyle = "#fff6e2";
+          g.font = `700 ${fs}px "Gowun Batang",serif`;
+          g.fillText(fitText(g, r.name, w - 120), 94, cy - (r.sub ? fs * 0.24 : 0));
+          if (r.sub) {
+            g.fillStyle = "#e9dcc0";
+            g.font = `400 ${Math.round(fs * 0.48)}px "Gowun Dodum",sans-serif`;
+            g.fillText(r.sub, 96, cy + fs * 0.46);
+          }
+          if (i < n - 1) {
+            g.strokeStyle = "rgba(216,181,106,.3)";
+            g.lineWidth = 2;
+            g.beginPath();
+            g.moveTo(30, cy + rh / 2);
+            g.lineTo(w - 30, cy + rh / 2);
+            g.stroke();
+          }
+        });
+      }
+      function buildGuideBoard(b) {
+        const W = 512,
+          H = 300,
+          sn = Math.sin(b.rot),
+          cs = Math.cos(b.rot),
+          front = guideRows(b.front, -sn, -cs, b.x, b.z),
+          back = guideRows(b.back, sn, cs, b.x, b.z);
+        const tex = cTex(W, H * 2, (g) => {
+          drawGuideSide(g, 0, W, H, front);
+          drawGuideSide(g, H, W, H, back);
+        });
+        const grp = new THREE.Group();
+        grp.position.set(b.x, 0, b.z);
+        grp.rotation.y = b.rot;
+        scene.add(grp);
+        const bw = 1.9,
+          bh = (bw * H) / W,
+          by = 1.62;
+        /* 기둥은 판 양옆에 두어 글씨를 가리지 않게 합니다. */
+        for (const k of [-1, 1]) {
+          box(0.13, by + bh / 2 + 0.1, 0.13, M.woodD, k * (bw / 2 + 0.12), (by + bh / 2 + 0.1) / 2, 0, grp);
+          box(0.3, 0.14, 0.3, M.stone, k * (bw / 2 + 0.12), 0.07, 0, grp);
+        }
+        const fr = box(bw + 0.12, bh + 0.12, 0.08, M.woodD, 0, by, 0, grp);
+        OCC.push(fr);
+        box(bw + 0.4, 0.08, 0.36, M.roof, 0, by + bh / 2 + 0.14, 0, grp);
+        const mat = signMat(tex),
+          faces = [];
+        for (const s of [0, 1]) {
+          const geo = new THREE.PlaneGeometry(bw, bh),
+            uv = geo.attributes.uv;
+          for (let i = 0; i < uv.count; i++) uv.setY(i, s ? uv.getY(i) * 0.5 : 0.5 + uv.getY(i) * 0.5);
+          const m = add(new THREE.Mesh(geo, mat), grp, false, true);
+          m.position.set(0, by, s ? -0.045 : 0.045);
+          if (s) m.rotation.y = Math.PI;
+          faces.push(m);
+        }
+        for (const k of [-1, 1]) circ(b.x + k * (bw / 2 + 0.12) * cs, b.z - k * (bw / 2 + 0.12) * sn, 0.24);
+        addIt({
+          k: "guide",
+          x: b.x,
+          z: b.z,
+          r: 1.6,
+          label: () => "둘러보기 열기",
+          act: openMap,
+          meshes: [...faces, fr],
+        });
+      }
+      function buildFloorMark(fm) {
+        const l = Math.hypot(fm.dir[0], fm.dir[1]),
+          fx = fm.dir[0] / l,
+          fz = fm.dir[1] / l,
+          rows = fm.to.map(([id, v]) => ({ name: placeName(id), a: turnTo(fx, fz, fm.x, fm.z, v[0], v[1]) })),
+          one = rows.length === 1,
+          PX = 180,
+          W = 380,
+          RH = one ? 150 : 112,
+          H = rows.length * RH + 40;
+        const tex = cTex(W, H, (g) => {
+          g.fillStyle = "rgba(61,42,28,.9)";
+          roundRect(g, 4, 4, W - 8, H - 8, 30);
+          g.fill();
+          g.strokeStyle = "rgba(216,181,106,.95)";
+          g.lineWidth = 5;
+          roundRect(g, 14, 14, W - 28, H - 28, 22);
+          g.stroke();
+          g.textAlign = "left";
+          g.textBaseline = "middle";
+          rows.forEach((r, i) => {
+            const cy = 20 + RH * (i + 0.5),
+              fs = one ? 44 : 38;
+            g.fillStyle = "#e8c470";
+            drawArrow(g, 66, cy, one ? 40 : 32, r.a);
+            g.fillStyle = "#fff6e2";
+            g.save();
+            g.translate(112, cy);
+            g.scale(1, 1.45);
+            g.font = `700 ${fs}px "Gowun Batang",serif`;
+            g.fillText(fitText(g, r.name, W - 136), 0, 0);
+            g.restore();
+          });
+        });
+        const geo = new THREE.PlaneGeometry(W / PX, H / PX);
+        geo.rotateX(-Math.PI / 2);
+        const m = new THREE.Mesh(
+          geo,
+          signMat(tex, 0.06, 0.32, {
+            transparent: true,
+            depthWrite: false,
+            polygonOffset: true,
+            polygonOffsetFactor: -4,
+            polygonOffsetUnits: -4,
+          }),
+        );
+        m.position.set(fm.x, 0.045, fm.z);
+        m.rotation.y = Math.atan2(-fx, -fz);
+        m.receiveShadow = true;
+        scene.add(m);
+      }
+      function buildMapBoard(b) {
+        const W = 768,
+          H = 640;
+        const tex = cTex(W, H, (g) => {
+          g.fillStyle = "#3d2a1c";
+          g.fillRect(0, 0, W, H);
+          g.strokeStyle = "#d8b56a";
+          g.lineWidth = 6;
+          g.strokeRect(10, 10, W - 20, H - 20);
+          g.textAlign = "center";
+          g.textBaseline = "alphabetic";
+          g.fillStyle = "#fff6e2";
+          g.font = '700 42px "Gowun Batang",serif';
+          g.fillText("마을 안내도", W / 2, 64);
+          g.fillStyle = "#e9dcc0";
+          g.font = '400 21px "Gowun Dodum",sans-serif';
+          g.fillText("누르면 둘러보기가 열려요", W / 2, 96);
+          g.save();
+          g.beginPath();
+          g.rect(28, 114, W - 56, H - 142);
+          g.clip();
+          paintMap(g, { x0: 28, y0: 114, W: W - 56, H: H - 142, cx: 22, cz: 2, S: 5.3, k: 1.3, here: b });
+          g.restore();
+        });
+        const grp = new THREE.Group();
+        grp.position.set(b.x, 0, b.z);
+        grp.rotation.y = b.rot;
+        scene.add(grp);
+        const bw = 2.9,
+          bh = (bw * H) / W,
+          by = 1.95;
+        for (const s of [-1, 1]) {
+          box(
+            0.16,
+            by + bh / 2 + 0.1,
+            0.16,
+            M.woodD,
+            s * (bw / 2 - 0.15),
+            (by + bh / 2 + 0.1) / 2,
+            -0.06,
+            grp,
+          );
+          box(0.36, 0.16, 0.36, M.stone, s * (bw / 2 - 0.15), 0.08, -0.06, grp);
+        }
+        const fr = box(bw + 0.14, bh + 0.14, 0.1, M.woodD, 0, by, -0.02, grp);
+        OCC.push(fr);
+        box(bw + 0.5, 0.09, 0.5, M.roof, 0, by + bh / 2 + 0.16, -0.02, grp);
+        const face = add(
+          new THREE.Mesh(new THREE.PlaneGeometry(bw, bh), signMat(tex, 0.14, 0.55)),
+          grp,
+          false,
+          true,
+        );
+        face.position.set(0, by, 0.04);
+        const c = Math.cos(b.rot),
+          s = Math.sin(b.rot);
+        for (const k of [-1, 1]) circ(b.x + k * (bw / 2 - 0.15) * c, b.z - k * (bw / 2 - 0.15) * s, 0.3);
+        addIt({
+          k: "guide",
+          x: b.x,
+          z: b.z,
+          r: 2,
+          label: () => "둘러보기 열기",
+          act: openMap,
+          meshes: [face, fr],
+        });
+      }
+      function buildGuides() {
+        GUIDE_BOARDS.forEach(buildGuideBoard);
+        FLOOR_MARKS.forEach(buildFloorMark);
+        buildMapBoard(MAP_BOARD);
       }
 
       /* ===== 나무 · 풀 ===== */
@@ -5662,7 +6190,54 @@
         }
       });
       addEventListener("keyup", (e) => keys.delete(e.key.toLowerCase()));
-      addEventListener("blur", () => keys.clear());
+      addEventListener("blur", () => {
+        keys.clear();
+        joyEnd();
+      });
+      /* 휴대폰 조이스틱: 왼쪽 아래 동그라미를 밀면 그쪽으로 걷고, 끝까지 밀면 빨리 걷습니다. */
+      const joy = { on: false, id: null, x: 0, y: 0 },
+        joyEl = $("joy"),
+        joyKnob = joyEl.querySelector("i");
+      function joySet(cx, cy) {
+        const r = joyEl.getBoundingClientRect(),
+          R = r.width * 0.36;
+        let dx = cx - (r.left + r.width / 2),
+          dy = cy - (r.top + r.height / 2);
+        const l = Math.hypot(dx, dy);
+        if (l > R) {
+          dx *= R / l;
+          dy *= R / l;
+        }
+        joy.x = dx / R;
+        joy.y = dy / R;
+        joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+      }
+      function joyEnd(e) {
+        if (e && e.pointerId !== joy.id) return;
+        joy.on = false;
+        joy.id = null;
+        joy.x = joy.y = 0;
+        joyKnob.style.transform = "";
+        joyEl.classList.remove("on");
+      }
+      joyEl.addEventListener("pointerdown", (e) => {
+        e.preventDefault();
+        joy.on = true;
+        joy.id = e.pointerId;
+        try {
+          joyEl.setPointerCapture(e.pointerId);
+        } catch (err) {}
+        joyEl.classList.add("on");
+        joySet(e.clientX, e.clientY);
+        hideHint();
+      });
+      joyEl.addEventListener("pointermove", (e) => {
+        if (joy.on && e.pointerId === joy.id) joySet(e.clientX, e.clientY);
+      });
+      joyEl.addEventListener("pointerup", joyEnd);
+      joyEl.addEventListener("pointercancel", joyEnd);
+      joyEl.addEventListener("lostpointercapture", joyEnd);
+      joyEl.addEventListener("contextmenu", (e) => e.preventDefault());
 
       /* ===== 갱신 ===== */
       let NEAR = null,
@@ -5682,7 +6257,17 @@
           if (keys.has("q")) camS.yaw += dt * 1.8;
           if (keys.has("e")) camS.yaw -= dt * 1.8;
         }
-        me.run = keys.has("shift");
+        let jm = 0;
+        if (joy.on && !document.querySelector(".ov.on") && !profOpen) {
+          jm = Math.hypot(joy.x, joy.y);
+          if (jm > 0.2) {
+            ix += joy.x;
+            iz += joy.y;
+            /* 앞으로 밀면서 옆으로 기울이면, 시점도 천천히 그쪽으로 따라 돕니다. */
+            if (joy.y < -0.3) camS.yaw -= joy.x * dt * 1.15;
+          } else jm = 0;
+        }
+        me.run = keys.has("shift") || jm > 0.93;
         let mv = false,
           vx = 0,
           vz = 0;
@@ -6179,6 +6764,7 @@
         glassMats.forEach((g) => (g.emissiveIntensity = m.glass));
         roseMat.emissiveIntensity = m.glass;
         M.win.emissiveIntensity = m.win;
+        SIGNM.forEach((s) => (s.emissiveIntensity = n ? s.userData.night : s.userData.day));
         GLOWS.forEach((g) => (g.material.opacity = m.glow));
         stars.material.opacity = m.stars;
         moon.material.opacity = m.moon;
@@ -6354,6 +6940,7 @@
         const t = $("toast");
         t.textContent = m;
         t.classList.add("on");
+        $("place").classList.remove("on");
         clearTimeout(tT);
         tT = setTimeout(() => t.classList.remove("on"), 3200);
       }
@@ -6632,31 +7219,44 @@
         MS = 720 / 188,
         MCX = 0,
         mxy = (x, z) => [360 + (x - MCX) * MS, 360 + z * MS];
-      function drawMap() {
-        const g = mg;
+      /* 지도 그리기: 둘러보기 지도와 입구의 마을 안내도가 함께 씁니다. */
+      function paintMap(g, o = {}) {
+        const {
+          x0 = 0,
+          y0 = 0,
+          W = 720,
+          H = 720,
+          cx = MCX,
+          cz = 0,
+          S = MS,
+          k = 1,
+          people = false,
+          here = null,
+        } = o;
+        const P = (x, z) => [x0 + W / 2 + (x - cx) * S, y0 + H / 2 + (z - cz) * S];
         g.fillStyle = "#b9ad86";
-        g.fillRect(0, 0, 720, 720);
+        g.fillRect(x0, y0, W, H);
         g.fillStyle = "#93a35e";
         g.beginPath();
-        g.arc(...mxy(0, 0), WORLD_R * MS, 0, 7);
+        g.arc(...P(0, 0), WORLD_R * S, 0, 7);
         g.fill();
         g.strokeStyle = "#dccaa4";
         g.lineCap = "round";
         g.lineJoin = "round";
-        g.lineWidth = 2.6 * MS;
+        g.lineWidth = 2.6 * S;
         for (const p of PATHS) {
           g.beginPath();
           p.forEach(([x, z], i) => {
-            const [a, b] = mxy(x, z);
+            const [a, b] = P(x, z);
             i ? g.lineTo(a, b) : g.moveTo(a, b);
           });
           g.stroke();
         }
         const circle = (x, z, r, c) => {
-          const [a, b] = mxy(x, z);
+          const [a, b] = P(x, z);
           g.fillStyle = c;
           g.beginPath();
-          g.arc(a, b, r * MS, 0, 7);
+          g.arc(a, b, r * S, 0, 7);
           g.fill();
         };
         circle(0, 8, 8.6, "#e3d6bc");
@@ -6664,9 +7264,9 @@
         circle(-20, -14, 6.6, "#d4c8aa");
         circle(0, 8, 1.5, "#3c5a39");
         for (const t of TREES) if (t.inner) circle(t.x, t.z, 1.3 * t.s, t.pine ? "#4a6a43" : "#c4683a");
-        const rr = (x0, z0, x1, z1, c) => {
-          const [a, b] = mxy(x0, z0),
-            [cc, d] = mxy(x1, z1);
+        const rr = (xa, za, xb, zb, c) => {
+          const [a, b] = P(xa, za),
+            [cc, d] = P(xb, zb);
           g.fillStyle = c;
           g.fillRect(a, b, cc - a, d - b);
         };
@@ -6677,24 +7277,42 @@
         rr(MUS.x0, MUS.zc0, MUS.x1, MUS.zc1, "#c9bfae");
         rr(14, -17, 28, 1, "#d8d0c0");
         g.textAlign = "center";
+        g.textBaseline = "alphabetic";
         HALLS.forEach((h) => {
           rr(h.x0 + 0.6, h.z0 + 0.6, h.x1 - 0.6, h.z1 - 0.6, SECS[h.i].color);
-          const [a, b] = mxy(h.cx, h.cz);
+          const [a, b] = P(h.cx, h.cz);
           g.fillStyle = "#fff";
-          g.font = '700 26px "Gowun Batang",serif';
-          g.fillText(String(h.i + 1), a, b + 9);
+          g.font = `700 ${Math.round(26 * k)}px "Gowun Batang",serif`;
+          g.fillText(String(h.i + 1), a, b + 9 * k);
         });
-        g.font = '600 18px "Gowun Dodum",sans-serif';
+        g.font = `600 ${Math.round(18 * k)}px "Gowun Dodum",sans-serif`;
         for (const p of PLACES) {
-          const [a, b] = mxy(p.x, p.z);
+          const [a, b] = P(p.x, p.z);
           g.fillStyle = "rgba(255,255,255,.92)";
-          const w = g.measureText(p.name).width + 14;
-          g.fillRect(a - w / 2, b - 28, w, 24);
+          const w = g.measureText(p.name).width + 14 * k;
+          g.fillRect(a - w / 2, b - 28 * k, w, 24 * k);
           g.fillStyle = "#2a2f45";
-          g.fillText(p.name, a, b - 10);
+          g.fillText(p.name, a, b - 10 * k);
         }
+        if (here) {
+          const [a, b] = P(here.x, here.z);
+          g.fillStyle = "#d8443a";
+          g.beginPath();
+          g.arc(a, b, 10 * k, 0, 7);
+          g.fill();
+          g.strokeStyle = "#fff";
+          g.lineWidth = 3 * k;
+          g.stroke();
+          g.font = `700 ${Math.round(17 * k)}px "Gowun Dodum",sans-serif`;
+          g.fillStyle = "#fff";
+          g.strokeStyle = "#7a1f18";
+          g.lineWidth = 4 * k;
+          g.strokeText("현재 위치", a, b + 32 * k);
+          g.fillText("현재 위치", a, b + 32 * k);
+        }
+        if (!people) return;
         for (const o of peersArr) {
-          const [a, b] = mxy(o.x, o.z);
+          const [a, b] = P(o.x, o.z);
           g.fillStyle = COLS[o.c];
           g.beginPath();
           g.arc(a, b, 6, 0, 7);
@@ -6703,7 +7321,7 @@
           g.lineWidth = 2;
           g.stroke();
         }
-        const [a, b] = mxy(me.x, me.z);
+        const [a, b] = P(me.x, me.z);
         g.fillStyle = "#e8a93c";
         g.beginPath();
         g.arc(a, b, 9, 0, 7);
@@ -6718,6 +7336,9 @@
         g.closePath();
         g.fillStyle = "#fff";
         g.fill();
+      }
+      function drawMap() {
+        paintMap(mg, { people: true });
       }
       function renderPlaces() {
         $("places").innerHTML =
@@ -6751,11 +7372,12 @@
         closeOv($("mOv"));
         teleport(x, z);
       };
-      $("bMap").onclick = () => {
+      function openMap() {
         drawMap();
         renderPlaces();
         openOv("mOv");
-      };
+      }
+      $("bMap").onclick = openMap;
 
       /* ===== 기도의 벽 ===== */
       const ago = (t) => {
@@ -7739,6 +8361,69 @@
       };
       let meTag;
 
+      /* ===== 지금 있는 곳 ===== */
+      /* 장소나 전시실에 들어서면 화면 위쪽에 이름을 잠깐 띄웁니다. [x, z, 반지름] */
+      const AREAS = {
+        gate: [0, 42, 6],
+        plaza: [0, 8, 9.6],
+        bell: [-20, 4, 5],
+        garden: [-19, -13, 7.5],
+        cafe: [15, 29.5, 5.5],
+        pond: [-15, 30, 7],
+      };
+      function areaAt(x, z) {
+        const zb = zoneAt(x, z);
+        if (zb && zb.name === "chapel") return { id: "chapel", ...pick("chapel") };
+        if (zb && MUSZ.has(zb.name)) {
+          if (zb.name.startsWith("hall")) {
+            const h = HALLS[+zb.name.slice(4)],
+              S = SECS[h.i];
+            return { id: zb.name, name: `${h.i + 1}전시실 · ${S.name}`, d: S.desc || "" };
+          }
+          return { id: "gallery", name: placeName("gallery"), d: "로비 · 7개 전시실" };
+        }
+        let best = null,
+          bd = 1e9;
+        for (const id in AREAS) {
+          const [ax, az, ar] = AREAS[id],
+            d = Math.hypot(x - ax, z - az);
+          if (d < ar && d < bd) {
+            bd = d;
+            best = id;
+          }
+        }
+        return best ? { id: best, ...pick(best) } : null;
+      }
+      function pick(id) {
+        const p = PLACES.find((q) => q.id === id) || {};
+        return { name: p.name || id, d: p.d || "" };
+      }
+      let areaId = null,
+        areaT = 0,
+        placeT = 0;
+      const areaSeen = {};
+      function showPlace(name, d) {
+        const el = $("place");
+        el.querySelector("b").textContent = name;
+        el.querySelector("small").textContent = d;
+        el.classList.add("on");
+        clearTimeout(placeT);
+        placeT = setTimeout(() => el.classList.remove("on"), 2800);
+      }
+      function updateArea(now) {
+        if (now < areaT) return;
+        areaT = now + 400;
+        const a = areaAt(me.x, me.z),
+          id = a ? a.id : null,
+          prev = areaId;
+        if (id === areaId) return;
+        areaId = id;
+        if (!a || now - (areaSeen[id] || -1e9) < 25000) return;
+        if (id === "gallery" && prev && prev.startsWith("hall")) return;
+        areaSeen[id] = now;
+        showPlace(a.name, a.d);
+      }
+
       /* ===== 루프 ===== */
       const clock = new THREE.Clock();
       let hallT = 0;
@@ -7751,6 +8436,7 @@
           t = clock.elapsedTime,
           now = performance.now();
         updateMe(dt, now);
+        updateArea(now);
         meL.root.position.set(me.x, me.y, me.z);
         meL.root.rotation.y = me.rot;
         const gp = (now - me.greetAt) / 2600;
@@ -7840,6 +8526,7 @@
         progress(0.62, "나무를 심는 중이에요");
         await nextFrame();
         buildTrees();
+        buildGuides();
         progress(0.74, "전시실에 걸 사진을 고르는 중이에요");
         await nextFrame();
         bases();
@@ -7854,8 +8541,10 @@
         renderNotes();
         refreshCandles();
         renderPeople();
+        if (isTouch) document.body.classList.add("hasjoy");
+        areaId = (areaAt(me.x, me.z) || {}).id || null;
         $("hint").textContent = isTouch
-          ? "바닥을 눌러 걷기 · 끌어서 둘러보기 · 두 손가락으로 확대"
+          ? "왼쪽 아래 조이스틱으로 걷기 · 바닥을 눌러도 걸어요 · 끌어서 둘러보기"
           : "바닥 클릭으로 걷기 · 드래그로 둘러보기 · 휠로 확대/축소 · WASD · T로 대화";
         progress(0.92, "등불을 켜는 중이에요");
         updateCam(1);
